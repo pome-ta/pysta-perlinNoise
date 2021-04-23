@@ -109,13 +109,13 @@ if __name__ == '__main__':
   import random
   prln = Perlin()
   for i in range(64):
-    x = random.random()
-    y = random.random()
-    z = random.random()
-    print('/ --- --- ---')
-    print('rnd:x',x)
-    print('rnd:y',y)
-    print('rnd:z',z)
+    x = random.uniform(-1, 1)
+    y = random.uniform(-1, 1)
+    z = random.uniform(-1, 1)
+    #print('/ --- --- ---')
+    #print('rnd:x',x)
+    #print('rnd:y',y)
+    #print('rnd:z',z)
     print('prln:',prln.perlin(x, y, z))
-    print('--- --- --- /')
+    #print('--- --- --- /')
     
