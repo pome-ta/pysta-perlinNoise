@@ -20,10 +20,8 @@ class Perlin:
       138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66,
       215, 61, 156, 180
     ]
-    self.__p = [None] * 512
-    for x in range(512):
-      self.__p[x] = __permutation[x % 256]
-
+    self.__p = [__permutation[_ % 256] for _ in range(512)]
+    
   def OctavePerlin(self,
                    x: float,
                    y: float,
