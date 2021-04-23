@@ -40,7 +40,7 @@ class Perlin:
       frequency *= 2
     return total / maxValue
 
-  def perlin(self, x: float, y: float, z: float) -> float:
+  def perlin(self, x: float, y: float=0, z: float=0) -> float:
     if self.repeat > 0:
       x = x % self.repeat
       y = y % self.repeat
