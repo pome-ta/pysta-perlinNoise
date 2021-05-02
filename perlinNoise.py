@@ -114,6 +114,6 @@ if __name__ == '__main__':
     #print('rnd:x',x)
     #print('rnd:y',y)
     #print('rnd:z',z)
-    print('prln:',prln.perlin(x, y, z))
+    print('prln:',prln.perlin(x=x, y=y, z=z))
     #print('--- --- --- /')
     
