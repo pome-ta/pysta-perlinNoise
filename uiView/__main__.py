@@ -1,13 +1,11 @@
-# https://yuki67.github.io/post/perlin_noise/
+from math import floor
+from colorsys import hsv_to_rgb
+
+import numpy as np
 
 import ui
-import random as r
-from math import floor
-#from itertools import product
-import numpy as np
-import colorsys as c
 
-
+# https://yuki67.github.io/post/perlin_noise/
 class Perlin():
   def __init__(self):
     self.slopes = 2 * np.random.random((256, 2)) - 1
@@ -27,7 +25,6 @@ class Perlin():
   def fade(x):
     return 6 * x**5 - 15 * x**4 + 10 * x**3
 
-  #@staticmethod
   def weight(self, ix, iy, dx, dy):
     # 格子点(ix, iy)に対する(ix + dx, iy + dy)の重みを求める
     ix %= 256
@@ -35,7 +32,6 @@ class Perlin():
     ax, ay = self.slopes[self.hash(ix, iy)]
     return ax * dx + ay * dy
 
-  #@staticmethod
   def noise(self, x, y):
     ix = floor(x)
     iy = floor(y)
@@ -56,51 +52,53 @@ class Perlin():
     y0 = Perlin.lerp(w00, w10, wx)
     y1 = Perlin.lerp(w01, w11, wx)
     return (Perlin.lerp(y0, y1, wy) + 0.5)
-    # todo:ここの値をうまく調節したい
 
 
-class MyView(ui.View):
-  def __init__(self):
+
+
+class DrawView(ui.View):
+  def __init__(self, frame, *args, **kwargs):
+    ui.View.__init__(self, *args, **kwargs)
+    # todo:マス目数を変えたいとき
+    self.div = 64
+    # todo: 格子点の数を決めてノイズの粗さを決める
+    self.w = 4
+    self.width = frame[2]
+    self.height = frame[3]
+
+  def draw(self):
+    x = self.width
+    y = self.height
+    xw = x / self.div
+    # todo: 縦マス目 1/2
+    yh = y / self.div / 2
+
+    pl = Perlin()
+
+    for i in range(self.div):
+      mul = xw * i
+      # todo: 縦の敷き詰めを2倍
+      for j in range(self.div * 2):
+        H = pl.noise((i * self.w / self.div), ((j * self.w * 2) / (self.div * 2)))
+
+        #ui.set_color(H)
+        ui.set_color(hsv_to_rgb(H, 1, 1))
+        rect = ui.Path.oval(mul, xw * j, xw, xw)
+        rect.fill()
+
+class MainView(ui.View):
+  def __init__(self, *args, **kwargs):
+    ui.View.__init__(self, *args, **kwargs)
     self.bg_color = 1
     self.tint_color = .25
     self.viewCount = 1
 
   def draw(self):
-    self.add_subview(DrawView())
+    self.add_subview(DrawView(self.frame))
 
   def layout(self):
-    self.name = '#_' + '{0:03d}'.format(self.viewCount)
+    self.name = f'#_{self.viewCount:03d}'
 
-
-class DrawView(ui.View):
-  def __init__(self):
-    # todo:マス目数を変えたいとき●
-    self.div = 64
-    self.width = bv.width
-    self.height = bv.height
-
-  def draw(self):
-    x = self.frame[2]
-    y = self.frame[3]
-    xw = x / self.div
-    # todo:縦マス目2分の1●
-    yh = y / self.div / 2
-
-    pl = Perlin()
-    # todo:格子点の数を決めてノイズの粗さを決める
-    w = 4
-
-    for i in range(self.div):
-      mul = xw * i
-      # todo:縦の敷き詰めを2倍●
-      for j in range(self.div * 2):
-        H = pl.noise((i * w / self.div), ((j * w * 2) / (self.div * 2)))
-
-        #ui.set_color(H)
-        ui.set_color(c.hsv_to_rgb(H, 1, 1))
-
-        rect = ui.Path.oval(mul, xw * j, xw, xw)
-        rect.fill()
 
 
 def reload_view(sender):
@@ -118,7 +116,7 @@ def save_view(sender):
     im.show()
 
 
-bv = MyView()
+bv = MainView()
 reload_icon = ui.Image.named('iob:ios7_refresh_outline_32')
 reload_btn = ui.ButtonItem(image=reload_icon)
 reload_btn.action = reload_view
