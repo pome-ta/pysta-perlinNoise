@@ -5,6 +5,7 @@ import numpy as np
 
 import ui
 
+
 # https://yuki67.github.io/post/perlin_noise/
 class Perlin():
   def __init__(self):
@@ -54,8 +55,6 @@ class Perlin():
     return (Perlin.lerp(y0, y1, wy) + 0.5)
 
 
-
-
 class DrawView(ui.View):
   def __init__(self, frame, *args, **kwargs):
     ui.View.__init__(self, *args, **kwargs)
@@ -79,12 +78,14 @@ class DrawView(ui.View):
       mul = xw * i
       # todo: 縦の敷き詰めを2倍
       for j in range(self.div * 2):
-        H = pl.noise((i * self.w / self.div), ((j * self.w * 2) / (self.div * 2)))
+        H = pl.noise((i * self.w / self.div),
+                     ((j * self.w * 2) / (self.div * 2)))
 
         #ui.set_color(H)
         ui.set_color(hsv_to_rgb(H, 1, 1))
         rect = ui.Path.oval(mul, xw * j, xw, xw)
         rect.fill()
+
 
 class MainView(ui.View):
   def __init__(self, *args, **kwargs):
@@ -93,39 +94,37 @@ class MainView(ui.View):
     self.tint_color = .25
     self.viewCount = 1
 
+    reload_icon = ui.Image.named('iob:ios7_refresh_outline_32')
+    reload_btn = ui.ButtonItem(image=reload_icon)
+    reload_btn.action = self.reload_view
+
+    save_icon = ui.Image.named('iob:ios7_download_outline_32')
+    save_btn = ui.ButtonItem(image=save_icon)
+    save_btn.action = self.save_view
+
+    self.right_button_items = [reload_btn, save_btn]
+
   def draw(self):
     self.add_subview(DrawView(self.frame))
 
   def layout(self):
     self.name = f'#_{self.viewCount:03d}'
 
+  def reload_view(self, sender):
+    self.remove_subview(self.subviews[0])
+    self.viewCount += 1
+    self.add_subview(DrawView(self.frame))
+
+  def save_view(self, sender):
+    w_im = self.subviews[0].frame[2]
+    h_im = self.subviews[0].frame[3]
+    with ui.ImageContext(w_im, h_im) as ctx:
+      self.subviews[0].draw_snapshot()
+      im = ctx.get_image()
+      im.show()
 
 
-def reload_view(sender):
-  bv.remove_subview(bv.subviews[0])
-  bv.viewCount += 1
-  bv.add_subview(DrawView())
-
-
-def save_view(sender):
-  w_im = bv.subviews[0].frame[2]
-  h_im = bv.subviews[0].frame[3]
-  with ui.ImageContext(w_im, h_im) as ctx:
-    bv.subviews[0].draw_snapshot()
-    im = ctx.get_image()
-    im.show()
-
-
-bv = MainView()
-reload_icon = ui.Image.named('iob:ios7_refresh_outline_32')
-reload_btn = ui.ButtonItem(image=reload_icon)
-reload_btn.action = reload_view
-
-save_icon = ui.Image.named('iob:ios7_download_outline_32')
-save_btn = ui.ButtonItem(image=save_icon)
-save_btn.action = save_view
-
-bv.right_button_items = [reload_btn, save_btn]
-
-bv.present()
+if __name__ == '__main__':
+  main_view = MainView()
+  main_view.present(style='fullscreen', orientations=['portrait'])
 
