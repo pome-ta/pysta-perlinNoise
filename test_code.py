@@ -13,11 +13,9 @@ with dump_data.open() as f:
       dump_list.append(_xyz)
       _xyz = []
 
-
-    
-
 for i in dump_list:
   print('---')
   print(i)
 
 print(len(dump_list))
+
